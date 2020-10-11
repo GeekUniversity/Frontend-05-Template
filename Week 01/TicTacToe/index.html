@@ -59,11 +59,28 @@
         color = 3 - color   // 这里这个开发技巧是根据业务特点选择合适的数据类型。
         console.log(bestChoice(pattern, color))
         show(pattern)
+        computerMove()
         if (willWin(pattern, color)) {
           console.log(color === 2 ? '❌ will win':'⭕ will win')
         }
 
       }
+      
+      // AI走棋
+      function computerMove() {
+        let choice = bestChoice(pattern, color)
+
+        if (choice.point) {
+          pattern[choice.point[0]][choice.point[1]] = color
+        }
+ 
+        if (check(pattern, color)) {
+          alert(color === 1 ? ' ⭕is winner' : '❌ is winner')
+        }
+        color = 3-color
+        show(pattern)
+      }         
+      
       // TODO: 写如何判断输赢
       // 检查每一行和每一列看
       function check(pattern, color) {
