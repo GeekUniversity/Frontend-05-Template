@@ -23,9 +23,9 @@
     <script>
       /* 2：叉；0: 空, 1: 圈*/
       let pattern = [
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0,
       ]
        
       let color = 1  // 默认为⭕
@@ -38,8 +38,8 @@
             let cell = document.createElement('div')
             cell.classList.add('cell')
             cell.innerText = 
-              pattern[i][j] === 2 ? '❌' :
-              pattern[i][j] === 1 ? '⭕' : ''
+              pattern[i*3 + j] === 2 ? '❌' :
+              pattern[i*3 + j] === 1 ? '⭕' : ''
             
             cell.addEventListener('click', () => move(pattern, i,j))
             board.appendChild(cell)
@@ -50,7 +50,7 @@
       }
       // 走棋
       function move(pattern, x, y) {
-        pattern[x][y] = color
+        pattern[x*3 + y] = color
         if (check(pattern, color)) {
           // setTimeout(() => {
           alert(color === 1 ? ' ⭕is winner' : '❌ is winner')
@@ -63,7 +63,6 @@
         if (willWin(pattern, color)) {
           console.log(color === 2 ? '❌ will win':'⭕ will win')
         }
-
       }
       
       // AI走棋
@@ -71,7 +70,7 @@
         let choice = bestChoice(pattern, color)
 
         if (choice.point) {
-          pattern[choice.point[0]][choice.point[1]] = color
+          pattern[choice.point[0]*3 + choice.point[1]] = color
         }
  
         if (check(pattern, color)) {
@@ -88,7 +87,7 @@
         for (let i=0; i<3; i++) {
           let win = true
           for (let j=0; j<3; j++) {
-            if(pattern[i][j] !== color) {
+            if(pattern[i*3 + j] !== color) {
               win = false
             }
           }
@@ -101,7 +100,7 @@
         for (j=0; j<3; j++ ) {
           let win = true
           for (i=0; i<3; i++) {
-            if (pattern[i][j] !== color) {
+            if (pattern[i*3 + j] !== color) {
               win = false
             }
           }
@@ -114,7 +113,7 @@
         {
           let win = true
           for (i=0; i<3; i++) {
-            if (pattern[i][i] !== color) {
+            if (pattern[i*4] !== color) {
               win = false
             }
           }
@@ -126,7 +125,7 @@
         {
           let win = true
           for (i=0; i<3; i++) {
-            if (pattern[i][2-i] !== color) {
+            if (pattern[(i+1)*2] !== color) {
               win = false
             }
           }
@@ -146,9 +145,9 @@
       function willWin(pattern, color) {
         for(let i=0; i<3; i++) {
           for (let j=0; j<3; j++) {
-            if (pattern[i][j] === 0) {
+            if (pattern[i*3 + j] === 0) {
               let temp = clone(pattern)
-              temp[i][j] = color
+              temp[i*3 + j] = color
               if (check(temp, color)) {
                 return [i, j]
               }
@@ -175,11 +174,11 @@
         let point = null
         outer: for (let i=0; i<3; i++) { 
           for (let j=0; j<3; j++) {
-            if (pattern[i][j]) {
+            if (pattern[i*3 + j]) {
               continue
             }
             let temp = clone(pattern)
-            temp[i][j] = color
+            temp[i*3 + j] = color
             let r = bestChoice(temp, 3-color).result
             if (-r > result) {
               result = -r
