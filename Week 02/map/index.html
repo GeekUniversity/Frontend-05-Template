@@ -103,10 +103,10 @@
               // if (paths.length === 3) break
               paths.push(map[y*100 + x])
               // 方案1
-              let [a, b] = table[y*100+x]
-              x = a
-              y = b
-              await sleep(50)
+              // let [a, b] = table[y*100+x]
+              // x = a
+              // y = b
+              // await sleep(50)
               // console.log(x,y, a, b)
               // 方案2
               // a = table[y*100 + x][0]
@@ -116,8 +116,8 @@
 
               // 方案3
               // console.log([x, y])
-              // [x, y] = table[y*100 + x]  // 这里解构赋值为什么会出现问题
-              // await sleep(10)
+              await sleep(0);  // uncomment await就可以正确执行
+              [x, y] = table[y*100 + x]  // 这里解构赋值为什么会出现问题
               container.children[y*100 + x].style.backgroundColor = 'purple'
             }
             return paths
