@@ -70,44 +70,70 @@
       }
 
       async function path(map, start, end) {
+        // 复制一份map记录path
+        let table = Object.create(map)
         // 使用队列数据结构，先进先出
         let queue = [start]
         // console.log('queue', queue)
         // push 逻辑
-        async function insert(x, y) {
-          // console.log('out', map[y*100+x], [x,y])
+        async function insert(x, y, pre) {
+          // console.log('out', map[y*100+x], 'pre', pre)
           // 地图边界处理
           if (x < 0 || x >=100 || y <0 || y >=100) {
             return
           }
-          // 墙处理
-          if (map[y*100 + x]) {
-            // console.log(map[y*100+x])
+          // 墙处理及找过的点
+          if (table[y*100 + x]) {
             return
           }
           queue.push([x, y])
           // 标记已经找过的点
-          await sleep(10)
+          // await sleep(5)
           container.children[y*100 + x].style.backgroundColor = 'lightgreen'
-          map[y*100 + x] = 2
+          table[y*100 + x] = pre
         }
 
         while (queue.length) {
-          // console.log('queue', queue)
           let [x, y] = queue.shift()
-          // console.log(x, y)
 
           // 如果找到end点则结束
-          if (end[0] === x && end[1] === y) {
-            return true
+          if (x === end[0] && y === end[1]) {
+            let paths = []
+            while (x != start[0] || y != start[1]) {
+              // if (paths.length === 3) break
+              paths.push(map[y*100 + x])
+              // 方案1
+              let [a, b] = table[y*100+x]
+              x = a
+              y = b
+              await sleep(50)
+              // console.log(x,y, a, b)
+              // 方案2
+              // a = table[y*100 + x][0]
+              // y = table[y*100 + x][1]
+              // x = a
+              // await sleep(15)
+
+              // 方案3
+              // console.log([x, y])
+              // [x, y] = table[y*100 + x]  // 这里解构赋值为什么会出现问题
+              // await sleep(10)
+              container.children[y*100 + x].style.backgroundColor = 'purple'
+            }
+            return paths
           }
 
-          await insert(x-1, y)
-          await insert(x+1, y)
-          await insert(x, y-1)
-          await insert(x, y+1)
+          await insert(x-1, y, [x, y])
+          await insert(x+1, y, [x, y])
+          await insert(x, y-1, [x, y])
+          await insert(x, y+1, [x, y])
+
+          await insert(x-1, y-1, [x, y])
+          await insert(x+1, y+1, [x, y])
+          await insert(x+1, y-1, [x, y])
+          await insert(x,-1, y+1, [x, y])
         }
-        return false
+        return null
       }
 
 
