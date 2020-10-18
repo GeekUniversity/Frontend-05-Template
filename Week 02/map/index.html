@@ -20,6 +20,35 @@
     <div id="container"></div>
     <button onclick="localStorage['map'] = JSON.stringify(map)">save</button>
     <script>
+      // 创建一个排序数据解构
+      class Sort {
+        constructor(data, compare) {
+          this.data = data.slice()  // 这里为什么要用slice
+          this.compare = compare || ((a, b) => a-b)  // 这里的箭头函数为什么要用小括号包裹起来。
+        }
+        take() {
+          let min = this.data[0]
+          let minIndex = 0
+          // 如果 data长度为0，则返回
+          if (this.data.length === 0) {
+            return
+          }
+
+          for (let i=1; i<this.data.length; i++) {
+            if (this.compare(this.data[i], min) < 0) {
+              min = this.data[i]
+              minIndex = i
+            }
+          }
+
+          this.data[minIndex] = this.data[this.data.length -1]
+          this.data.pop()
+          return min
+        }
+        give(v) {
+          this.data.push(v)
+        }
+      }
       let map = localStorage['map'] ? JSON.parse(localStorage['map']) : Array(10000).fill(0)
 
       let container = document.getElementById('container')
@@ -73,9 +102,12 @@
         // 复制一份map记录path
         let table = Object.create(map)
         // 使用队列数据结构，先进先出
-        let queue = [start]
-        // console.log('queue', queue)
+        let queue = new Sort([start], (a, b) => distance(a) - distance(b))
+        console.log('queue', queue, queue.data.length)
         // push 逻辑
+        function distance(ordinate) {
+          return (ordinate[0] - end[0]) ** 2  + (ordinate[1] - end[1]) ** 2
+        }
         async function insert(x, y, pre) {
           // console.log('out', map[y*100+x], 'pre', pre)
           // 地图边界处理
@@ -86,15 +118,16 @@
           if (table[y*100 + x]) {
             return
           }
-          queue.push([x, y])
+          queue.give([x, y])
           // 标记已经找过的点
           // await sleep(5)
           container.children[y*100 + x].style.backgroundColor = 'lightgreen'
           table[y*100 + x] = pre
         }
 
-        while (queue.length) {
-          let [x, y] = queue.shift()
+        while (queue.data.length) {
+          let [x, y] = queue.take()
+          console.log(x, y)
 
           // 如果找到end点则结束
           if (x === end[0] && y === end[1]) {
